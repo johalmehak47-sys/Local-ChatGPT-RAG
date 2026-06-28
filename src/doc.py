@@ -11,3 +11,4 @@ class Document:
     text: str
     page: int
     source: str
+    chunk_id: int = 0
