@@ -1,14 +1,17 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
 class Document:
-    """
-    Represents one page (or later, one chunk) of text
-    together with its metadata.
-    """
 
     text: str
-    page: int
-    source: str
-    chunk_id: int = 0
+
+    metadata: dict = field(default_factory=dict)
+# @dataclass
+# class Document:
+
+#     text: str
+
+#     metadata: dict = field(default_factory=dict)
+
+#     embedding: list[float] | None = None

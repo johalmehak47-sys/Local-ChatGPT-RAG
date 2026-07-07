@@ -1,19 +1,27 @@
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    category=FutureWarning
+)
+
 from src.pdf_loader import PDFLoader
 from src.chunker import TextChunker
-from src.embeddings import EmbeddingGenerator
+from src.embeddings.factory import EmbeddingFactory
+
 
 loader = PDFLoader()
-documents = loader.load("data/Final_Report_Template_Image_Captioning.pdf")
+documents = loader.load("data/Man's Search for Meaning .pdf")
 
 chunker = TextChunker()
-chunks = chunker.split(documents)
+documents = chunker.split(documents)
 
-embedder = EmbeddingGenerator()
-vectors = embedder.embed_documents(chunks)
+provider = EmbeddingFactory.create()
 
-print(f"Chunks : {len(chunks)}")
-print(f"Embeddings : {len(vectors)}")
+texts = [doc.text for doc in documents]
 
-print()
+embeddings = provider.embed(texts)
 
-print(f"Embedding Dimension : {len(vectors[0])}")
+print(f"Documents : {len(documents)}")
+print(f"Embeddings : {len(embeddings)}")
+print(f"Embedding Dimension : {len(embeddings[0])}")

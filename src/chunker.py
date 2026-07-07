@@ -37,9 +37,10 @@ class TextChunker:
                 chunks.append(
                     Document(
                         text=text,
-                        page=document.page,
-                        source=document.source,
-                        chunk_id=chunk_counter
+                        metadata={
+                            **document.metadata,
+                            "chunk_id": chunk_counter,
+                        },
                     )
                 )
 

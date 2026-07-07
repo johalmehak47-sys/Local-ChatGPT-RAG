@@ -30,8 +30,10 @@ class PDFLoader:
                 documents.append(
                     Document(
                         text=text,
-                        page=page_number,
-                        source=path.name,
+                        metadata={
+                            "page": page_number,
+                            "source": path.name,
+                        },
                     )
                 )
 
