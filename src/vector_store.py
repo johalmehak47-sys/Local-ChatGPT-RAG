@@ -15,10 +15,16 @@ class VectorStore:
     """
 
     def __init__(self):
+
         embedder = EmbeddingFactory.create()
 
+        self.collection_name = os.getenv(
+            "CHROMA_COLLECTION",
+            "knowledge_base",
+        )
+
         self.db = Chroma(
-            collection_name="knowledge_base",
+            collection_name=self.collection_name,
             embedding_function=embedder.embedding_model,
             persist_directory="database/chroma_db",
         )
@@ -32,7 +38,7 @@ class VectorStore:
         documents: list[Document],
     ):
         """
-        Yields batches of documents for efficient indexing.
+        Yield batches of documents for efficient indexing.
         """
 
         for i in range(
@@ -49,7 +55,7 @@ class VectorStore:
         documents: list[Document],
     ) -> None:
         """
-        Adds a list of Document objects to the vector database.
+        Add document chunks to the vector database.
         """
 
         total_batches = (
@@ -73,13 +79,16 @@ class VectorStore:
             ids = []
 
             for document in batch:
+
                 texts.append(document.text)
                 metadatas.append(document.metadata)
+
                 ids.append(
                     f"chunk_{document.metadata['chunk_id']}"
                 )
 
             try:
+
                 self.db.add_texts(
                     texts=texts,
                     metadatas=metadatas,
@@ -87,7 +96,62 @@ class VectorStore:
                 )
 
             except Exception as e:
+
                 print(
-                    f"Failed batch {index}/{total_batches}: {e}"
+                    f"Failed batch "
+                    f"{index}/{total_batches}: {e}"
                 )
+
                 raise
+
+    def collection_exists(
+        self,
+    ) -> bool:
+        """
+        Check whether the Chroma collection exists.
+        """
+
+        try:
+
+            self.db._collection.count()
+
+            return True
+
+        except Exception:
+
+            return False
+
+    def get_chunk_count(
+        self,
+    ) -> int:
+        """
+        Return the total number of indexed chunks.
+        """
+
+        if not self.collection_exists():
+
+            return 0
+
+        return self.db._collection.count()
+
+    def get_collection_name(
+        self,
+    ) -> str:
+        """
+        Return the active collection name.
+        """
+
+        return self.collection_name
+
+    def get_stats(
+        self,
+    ) -> dict:
+        """
+        Return vector store statistics.
+        """
+
+        return {
+            "ready": self.collection_exists(),
+            "collection": self.get_collection_name(),
+            "chunks": self.get_chunk_count(),
+        }

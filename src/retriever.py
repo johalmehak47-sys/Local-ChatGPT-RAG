@@ -20,7 +20,7 @@ class Retriever:
     def search(
         self,
         query: str,
-        k: int = 3,
+        k: int = 10,
     ):
         """
         Returns the top-k most relevant documents for the query.
